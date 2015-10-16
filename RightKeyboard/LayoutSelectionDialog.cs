@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using RightKeyboard.Win32;
 
@@ -21,7 +17,7 @@ namespace RightKeyboard {
 
 			IntPtr[] installedLayouts = API.GetKeyboardLayoutList();
 
-			foreach(Layout layout in RightKeyboard.Layout.GetLayouts()) {
+			foreach(Layout layout in Layout.GetLayouts()) {
 				foreach(IntPtr installedLayout in installedLayouts) {
 					ushort languageId = unchecked((ushort)installedLayout.ToInt32());
 					if(layout.Identifier == languageId) {

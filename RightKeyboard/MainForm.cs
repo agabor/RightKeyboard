@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using RightKeyboard.Win32;
 using System.Diagnostics;
@@ -17,11 +13,11 @@ namespace RightKeyboard {
 
 		private bool selectingLayout = false;
 		private ushort currentLayout;
-		private LayoutSelectionDialog layoutSelectionDialog = new LayoutSelectionDialog();
+		private readonly LayoutSelectionDialog layoutSelectionDialog = new LayoutSelectionDialog();
 
-		private Dictionary<IntPtr, ushort> languageMappings = new Dictionary<IntPtr, ushort>();
+		private readonly Dictionary<IntPtr, ushort> languageMappings = new Dictionary<IntPtr, ushort>();
 
-		private Dictionary<string, IntPtr> devicesByName = new Dictionary<string, IntPtr>();
+		private readonly Dictionary<string, IntPtr> devicesByName = new Dictionary<string, IntPtr>();
 
 		public MainForm() {
 			InitializeComponent();
@@ -182,9 +178,6 @@ namespace RightKeyboard {
 				case API.PBT_APMRESUMEAUTOMATIC:
 					Debug.WriteLine("PBT_APMRESUMEAUTOMATIC");
 					break;
-
-				default:
-					break;
 			}
 		}
 
@@ -202,14 +195,14 @@ namespace RightKeyboard {
 			}
 		}
 
-		private void CurrentDeviceChanged(IntPtr hCurrentDevice) {
+		private void CurrentDeviceChanged(IntPtr currentDevice) {
 			ushort layout;
-			if(!languageMappings.TryGetValue(hCurrentDevice, out layout)) {
+			if(!languageMappings.TryGetValue(currentDevice, out layout)) {
 				selectingLayout = true;
 				layoutSelectionDialog.ShowDialog();
 				selectingLayout = false;
 				layout = layoutSelectionDialog.Layout.Identifier;
-				languageMappings.Add(hCurrentDevice, layout);
+				languageMappings.Add(currentDevice, layout);
 			}
 			SetCurrentLayout(layout);
 			SetDefaultLayout(layout);
@@ -224,15 +217,9 @@ namespace RightKeyboard {
 		}
 
 		private void SetDefaultLayout(ushort layout) {
-			//IntPtr hkl = API.LoadKeyboardLayout(layout, 0);
-			//Debug.Assert(hkl != IntPtr.Zero);
-			//if(hkl == IntPtr.Zero) {
-			//    throw Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error());
-			//}
-
 			IntPtr hkl = new IntPtr(unchecked((int)((uint)layout << 16 | (uint)layout)));
 
-			bool ok = API.SystemParametersInfo(API.SPI_SETDEFAULTINPUTLANG, 0, new IntPtr[] { hkl }, API.SPIF_SENDCHANGE);
+			bool ok = API.SystemParametersInfo(API.SPI_SETDEFAULTINPUTLANG, 0, new[] { hkl }, API.SPIF_SENDCHANGE);
 			Debug.Assert(ok);
 		}
 
