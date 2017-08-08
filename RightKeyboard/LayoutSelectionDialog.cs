@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 using RightKeyboard.Win32;
+using System.Linq;
 
 namespace RightKeyboard {
 	public partial class LayoutSelectionDialog : Form {
@@ -17,17 +18,43 @@ namespace RightKeyboard {
 
 			IntPtr[] installedLayouts = API.GetKeyboardLayoutList();
 
-			foreach(Layout layout in Layout.GetLayouts()) {
-				foreach(IntPtr installedLayout in installedLayouts) {
-					ushort languageId = unchecked((ushort)installedLayout.ToInt32());
-					if(layout.Identifier == languageId) {
-						lbLayouts.Items.Add(layout);
-					}
-				}
-			}
+            var layoutCodes = installedLayouts.Select(l => ((l.ToInt32() >> 16)& 0xffff)).Distinct();
 
-			lbLayouts.SelectedIndex = 0;
-		}
+            foreach (var item in layoutCodes)
+            {
+                // Get layout name
+                var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Keyboard Layouts\0000" +
+                    item.ToString("X4"));
+
+                string name;
+                if (key == null)
+                    name = "Unknown " + item.ToString("X4");
+                else
+                    name = key.GetValue("Layout Text").ToString();
+
+                var layout = new Layout((ushort)item, name);
+                // Need full hkl, if there are several for a layout here we just take one,
+                // we can improve this by also having the language selection somehow...
+                layout.Hkl = installedLayouts.First(h => ((h.ToInt32() >> 16) & 0xffff) == item);
+                lbLayouts.Items.Add(layout);
+            }
+      // var layouts = Layout.GetLayouts();
+
+            //         foreach (IntPtr installedLayout in installedLayouts)
+            //         {
+            //             ushort languageId = unchecked((ushort)installedLayout.ToInt32());
+
+            //             var layout = layouts.FirstOrDefault(l => l.Identifier == languageId);
+
+            //             if (layout != null)
+            //             {
+            //                 layout.Hkl = installedLayout;
+            //                 lbLayouts.Items.Add(layout);
+            //             }
+            //         }
+
+            //lbLayouts.SelectedIndex = 0;
+        }
 
 		private int recentLayoutsCount = 0;
 		private Layout selectedLayout;

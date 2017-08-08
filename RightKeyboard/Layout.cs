@@ -31,18 +31,20 @@ namespace RightKeyboard {
 			}
 		}
 
-		/// <summary>
-		/// Initializes a new instance of Layout
-		/// </summary>
-		/// <param name="identifier"></param>
-		/// <param name="name"></param>
-		public Layout(ushort identifier, string name) {
+        public IntPtr Hkl { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of Layout
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <param name="name"></param>
+        public Layout(ushort identifier, string name) {
 			this.identifier = identifier;
 			this.name = name;
 		}
 
 		public override string ToString() {
-			return name;
+			return name + " (" + Hkl.ToString("X8") + ")";
 		}
 
 		private static Layout[] cachedLayouts = null;
