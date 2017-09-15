@@ -81,7 +81,7 @@ namespace RightKeyboard
                     {
                         var l = new Layout((ushort)hkl, deviceName);
                         l.Hkl = hkl;
-                        languageMappings.Add(deviceHandle, l); 
+                        languageMappings.Add(deviceHandle, l);
 
                     }
                 }
@@ -212,14 +212,29 @@ namespace RightKeyboard
             Layout layout;
             if (!languageMappings.TryGetValue(currentDevice, out layout))
             {
-                selectingLayout = true;
-                layoutSelectionDialog.ShowDialog();
-                selectingLayout = false;
-                layout = layoutSelectionDialog.Layout;
-                languageMappings.Add(currentDevice, layout);
+                layout = ShowGetLayoutForDeviceDialog(currentDevice);
             }
             SetCurrentLayout(layout.Hkl);
-            SetDefaultLayout(layout.Hkl);
+
+            if (!SetDefaultLayout(layout.Hkl))
+            {
+                layout = ShowGetLayoutForDeviceDialog(currentDevice);
+                SetCurrentLayout(layout.Hkl);
+
+                Debug.Assert(SetDefaultLayout(layout.Hkl));
+
+            }
+        }
+
+        private Layout ShowGetLayoutForDeviceDialog(IntPtr currentDevice)
+        {
+            Layout layout;
+            selectingLayout = true;
+            layoutSelectionDialog.ShowDialog();
+            selectingLayout = false;
+            layout = layoutSelectionDialog.Layout;
+            languageMappings[currentDevice] = layout;
+            return layout;
         }
 
         private void SetCurrentLayout(IntPtr layout)
@@ -232,13 +247,13 @@ namespace RightKeyboard
             }
         }
 
-        private void SetDefaultLayout(IntPtr hkl)
+        private bool SetDefaultLayout(IntPtr hkl)
         {
             //IntPtr hkl = new IntPtr(unchecked((int)((uint)layout << 16 | (uint)layout)));
 
             bool ok = API.SystemParametersInfo(API.SPI_SETDEFAULTINPUTLANG, 0, new[] { hkl }, API.SPIF_SENDCHANGE);
             uint er = API.GetLastError();
-            Debug.Assert(ok);
+            return ok;
         }
         //private void SetDefaultLayout(ushort layout)
         //{
