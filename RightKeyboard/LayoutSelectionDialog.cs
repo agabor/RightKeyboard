@@ -101,5 +101,11 @@ namespace RightKeyboard {
 			okPressed = false;
 			base.OnClosing(e);
 		}
-	}
+
+        private void LayoutSelectionDialog_VisibleChanged(object sender, EventArgs e)
+        {
+			lbLayouts.SelectedIndex = -1;
+			lbLayouts.Focus();
+        }
+    }
 }

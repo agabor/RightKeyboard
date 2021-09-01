@@ -202,18 +202,24 @@ namespace RightKeyboard
 
             if (header.hDevice != hCurrentDevice)
             {
-                hCurrentDevice = header.hDevice;
-                CurrentDeviceChanged(hCurrentDevice);
+                CurrentDeviceChanged(header.hDevice);
             }
         }
 
         private void CurrentDeviceChanged(IntPtr currentDevice)
         {
             Layout layout;
+
             if (!languageMappings.TryGetValue(currentDevice, out layout))
             {
                 layout = ShowGetLayoutForDeviceDialog(currentDevice);
+
+                if (layout == null)
+                {
+                    return;
+                }
             }
+
             SetCurrentLayout(layout.Hkl);
 
             if (!SetDefaultLayout(layout.Hkl))
@@ -222,8 +228,9 @@ namespace RightKeyboard
                 SetCurrentLayout(layout.Hkl);
 
                 Debug.Assert(SetDefaultLayout(layout.Hkl));
-
             }
+
+            hCurrentDevice = currentDevice;
         }
 
         private Layout ShowGetLayoutForDeviceDialog(IntPtr currentDevice)
@@ -233,7 +240,10 @@ namespace RightKeyboard
             layoutSelectionDialog.ShowDialog();
             selectingLayout = false;
             layout = layoutSelectionDialog.Layout;
-            languageMappings[currentDevice] = layout;
+            if (layout != null)
+            {
+                languageMappings[currentDevice] = layout;
+            }
             return layout;
         }
 
