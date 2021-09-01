@@ -11,7 +11,7 @@
     <RootNamespace>RightKeyboard</RootNamespace>
     <AssemblyName>RightKeyboard</AssemblyName>
     <ApplicationIcon>ico_input0002.ico</ApplicationIcon>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>

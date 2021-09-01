@@ -249,25 +249,20 @@ namespace RightKeyboard
 
         private bool SetDefaultLayout(IntPtr hkl)
         {
-            //IntPtr hkl = new IntPtr(unchecked((int)((uint)layout << 16 | (uint)layout)));
-
             bool ok = API.SystemParametersInfo(API.SPI_SETDEFAULTINPUTLANG, 0, new[] { hkl }, API.SPIF_SENDCHANGE);
             uint er = API.GetLastError();
             return ok;
         }
-        //private void SetDefaultLayout(ushort layout)
-        //{
-        //    IntPtr hkl = new IntPtr(unchecked((int)((uint)layout << 16 | (uint)layout)));
-
-        //    bool ok = API.SystemParametersInfo(API.SPI_SETDEFAULTINPUTLANG, 0, new[] { hkl }, API.SPIF_SENDCHANGE);
-        //    uint er = API.GetLastError();
-        //    Debug.Assert(ok);
-        //}
-
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void resetConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            languageMappings.Clear();
+            SaveConfiguration();
         }
     }
 }
