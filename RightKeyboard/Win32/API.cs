@@ -154,8 +154,8 @@ namespace RightKeyboard.Win32 {
 
 		[DllImport("user32", SetLastError = true)]
 		public static extern int BroadcastSystemMessage(uint dwFlags, ref uint lpdwRecipients, uint uiMessage, IntPtr wParam, IntPtr lParam);
-
-		[DllImport("user32.dll")]
+        
+        [DllImport("user32.dll")]
 		private static extern uint GetKeyboardLayoutList(int nBuff, IntPtr[] lpList);
 
 		public static IntPtr[] GetKeyboardLayoutList() {
@@ -165,6 +165,7 @@ namespace RightKeyboard.Win32 {
 			IntPtr[] localeHandles = new IntPtr[count];
 			int realCount = (int)GetKeyboardLayoutList(count, localeHandles);
 			Debug.Assert(realCount == count);
+            
 			return localeHandles;
 		}
 
@@ -178,7 +179,12 @@ namespace RightKeyboard.Win32 {
 			return LoadKeyboardLayout(string.Format("{0:X04}{0:X04}", layout), flags);
 		}
 
-		[DllImport("user32.dll")]
-		public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr[] pvParam, uint fWinIni);
+        [DllImport("kernel32.dll")]
+        public static extern uint GetLastError();
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr[] pvParam, uint fWinIni);
 	}
 }
